@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Thi Trắc Nghiệm Tiếng Anh - Ms Lê Hằng English</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #8854c0, #fdcb6e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            color: #2d3436;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* SVG Background Pattern Overlay */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M0 0h20v20H0V0zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 37a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H20V20zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM30 57a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H40V40zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM50 77a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H60V60zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Custom 3D Buttons */
+        .btn-3d {
+            transition: all 0.15s ease;
+            box-shadow: 0px 6px 0px 0px rgba(0,0,0,0.2);
+            position: relative;
+            top: 0;
+        }
+
+        .btn-3d:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            border: 3px solid #e0e0e0;
+            box-shadow: 0px 5px 0px 0px #cbd5e1;
+            color: #334155;
+            text-align: left;
+            border-radius: 18px;
+        }
+
+        .btn-option:hover:not(.selected-correct):not(.selected-wrong):not(:disabled) {
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+        }
+
+        .selected-correct {
+            background-color: #00D26A !important;
+            border-color: #00A352 !important;
+            box-shadow: 0px 5px 0px 0px #008040 !important;
+            color: white !important;
+        }
+
+        .selected-wrong {
+            background-color: #FF4757 !important;
+            border-color: #D63031 !important;
+            box-shadow: 0px 5px 0px 0px #B22222 !important;
+            color: white !important;
+        }
+
+        /* Shake animation for wrong answers */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Card Container */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Underline style for phonetics */
+        u {
+            text-decoration: underline;
+            text-decoration-color: #ef4444;
+            text-decoration-thickness: 3px;
+            color: #dc2626;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body class="py-6 px-3 md:px-8 flex flex-col items-center min-h-screen">
+
+    <div class="bg-pattern"></div>
+
+    <div class="max-w-4xl w-full z-10 space-y-6">
+
+        <!-- HEADER SECTION -->
+        <header class="text-center space-y-2">
+            <div class="inline-block bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full shadow-md">
+                <span class="text-sm md:text-base font-extrabold text-purple-700">
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> Giáo viên tạo: Ms Lê Hằng English
+                </span>
+            </div>
+            
+            <div class="bg-amber-300 text-amber-900 text-xs md:text-sm font-bold py-1 px-4 rounded-lg shadow inline-block">
+                📞 Đăng kí học tiếng anh 1-12, IELTS vui lòng liên hệ Ms Lê Hằng, zalo 0584 965 348
+            </div>
+        </header>
+
+        <!-- IMPORTANT NOTICE BOX -->
+        <div class="bg-gradient-to-r from-red-500 to-rose-600 text-white p-4 md:p-5 rounded-2xl shadow-lg border-2 border-white/50 text-center space-y-2">
+            <h2 class="font-black text-lg md:text-xl text-yellow-300 flex items-center justify-center gap-2">
+                ⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️
+            </h2>
+            <p class="text-xs md:text-sm font-bold leading-relaxed">
+                Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.
+            </p>
+            <p class="text-xs md:text-sm font-medium bg-black/20 p-2 rounded-xl">
+                Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!<br>
+                <span class="text-yellow-200 font-bold">Kéo tới đâu, làm tới đó! *</span>
+            </p>
+        </div>
+
+        <!-- SCORE PROGRESS BAR -->
+        <div class="sticky top-2 z-30 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-md flex justify-between items-center border border-purple-100">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-gray-700 text-sm md:text-base">Tiến độ:</span>
+                <span id="progress-text" class="font-black text-purple-600 text-base md:text-lg">0/40</span>
+            </div>
+            <div class="w-1/2 bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+            </div>
+            <div>
+                <span class="font-bold text-gray-700 text-sm md:text-base">Điểm:</span>
+                <span id="score-text" class="font-black text-amber-500 text-base md:text-lg">0</span>
+            </div>
+        </div>
+
+        <!-- QUESTIONS CONTAINER -->
+        <div id="quiz-container" class="space-y-8">
+            <!-- Questions dynamically generated by JavaScript -->
+        </div>
+
+        <!-- SUBMIT BUTTON AREA -->
+        <div class="text-center pt-6 pb-12">
+            <button onclick="submitQuiz()" class="btn-3d bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black text-xl py-4 px-10 rounded-2xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition-all">
+                <i class="fa-solid fa-paper-plane mr-2"></i> NỘP BÀI THI
+            </button>
+        </div>
+
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div id="result-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full text-center space-y-5 shadow-2xl relative animate-bounce-in">
+            <div class="w-20 h-20 mx-auto rounded-full bg-purple-100 flex items-center justify-center text-4xl text-purple-600 shadow-inner">
+                🏆
+            </div>
+            <h3 class="text-2xl font-black text-gray-800">KẾT QUẢ BÀI THI</h3>
+            <div class="text-4xl font-extrabold text-purple-600">
+                <span id="modal-score">0</span> / 40
+            </div>
+            <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                <p id="modal-feedback" class="text-gray-700 font-bold text-sm md:text-base leading-relaxed"></p>
+            </div>
+            <button onclick="closeModal()" class="btn-3d bg-purple-600 text-white font-black text-lg py-3 px-8 rounded-xl hover:bg-purple-700 w-full">
+                Xem lại bài làm
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Sound Generator
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playDing() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) { console.log(e); }
+        }
+
+        function playWrong() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch (e) { console.log(e); }
+        }
+
+        // Quiz Data
+        const rawQuestions = [
+            // Reading 1 (Passage Header)
+            {
+                section: "Read the passage and mark the letter A, B, C or D on your answer sheet to indicate the correct answer to each of the questions below.",
+                passage: `Staying healthy is very important if you want to live a long and happy life. There are many simple ways to keep fit.<br>
+First, you should eat healthy food such as vegetables, fruit, fish, and eggs. These foods give you vitamins and energy. You shouldn't eat too much fast food or sweet snacks because they can make you gain weight easily.<br>
+Second, doing exercise every day helps your body become stronger. You can go jogging, ride a bike, or even walk for thirty minutes a day. Exercise is also good for your heart and mind.<br>
+Finally, don't forget to get enough sleep. Sleeping for about eight hours a night helps you feel fresh and ready for a new day.`,
+                qNum: 1,
+                question: "What is the main idea of the passage?",
+                options: [
+                    "The importance of eating fast food.",
+                    "The benefits of sleeping late.",
+                    "Ways to stay healthy and fit.",
+                    "Reasons why people gain weight."
+                ],
+                correct: 2, // Index of "Ways to stay healthy and fit."
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Ý chính của đoạn văn là gì?<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. The importance of eating fast food: Tầm quan trọng của việc ăn thức ăn nhanh.<br>
+&nbsp;&nbsp;• B. The benefits of sleeping late: Lợi ích của việc thức khuya.<br>
+&nbsp;&nbsp;• C. Ways to stay healthy and fit: Các phương pháp để giữ gìn sức khỏe và vóc dáng cân đối.<br>
+&nbsp;&nbsp;• D. Reasons why people gain weight: Các lý do tại sao con người tăng cân.<br>
+3. <strong>Tại sao chọn C?</strong> Ngay câu mở đầu đoạn văn ghi <em>"There are many simple ways to keep fit"</em> (Có nhiều cách đơn giản để giữ dáng/khỏe mạnh) và các đoạn tiếp theo liệt kê các cách: ăn uống lành mạnh, tập thể dục, ngủ đủ giấc.<br>
+4. <strong>Tại sao A, B, D sai?</strong> A trái ngược thực tế bài (bài bảo hạn chế fast food); B sai vì bài khuyên ngủ đủ 8 tiếng chứ không phải thức khuya; D chỉ là một chi tiết nhỏ trong bài.`
+            },
+            {
+                qNum: 2,
+                question: "What kind of food should you eat to stay healthy?",
+                options: [
+                    "Fried chicken and hamburgers.",
+                    "Vegetables, fruit, fish, and eggs.",
+                    "Candy and soft drinks.",
+                    "Fast food and snacks."
+                ],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Bạn nên ăn loại thực phẩm nào để giữ sức khỏe?<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. Fried chicken and hamburgers: Gà rán và bánh hambơgơ.<br>
+&nbsp;&nbsp;• B. Vegetables, fruit, fish, and eggs: Rau củ, trái cây, cá và trứng.<br>
+&nbsp;&nbsp;• C. Candy and soft drinks: Kẹo và nước ngọt.<br>
+&nbsp;&nbsp;• D. Fast food and snacks: Thức ăn nhanh và đồ ăn vặt.<br>
+3. <strong>Tại sao chọn B?</strong> Dẫn chứng trong bài: <em>"First, you should eat healthy food such as vegetables, fruit, fish, and eggs."</em><br>
+4. <strong>Tại sao A, C, D sai?</strong> Cả 3 đáp án này đều là thức ăn nhanh/đồ ngọt không lành mạnh mà bài khuyên nên hạn chế (<em>"You shouldn't eat..."</em>).`
+            },
+            {
+                qNum: 3,
+                question: 'The word "fresh" in the last paragraph is OPPOSITE in meaning to _______.',
+                options: ["happy", "dirty", "tired", "lazy"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Từ "fresh" trong đoạn cuối TRÁI NGHĨA (OPPOSITE) với từ nào?<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. happy (adj): Vui vẻ.<br>
+&nbsp;&nbsp;• B. dirty (adj): Bẩn thỉu.<br>
+&nbsp;&nbsp;• C. tired (adj): Mệt mỏi.<br>
+&nbsp;&nbsp;• D. lazy (adj): Lười biếng.<br>
+3. <strong>Tại sao chọn C?</strong> Trong ngữ cảnh <em>"helps you feel fresh and ready for a new day"</em> (giúp bạn cảm thấy sảng khoái/tươi tỉnh và sẵn sàng cho ngày mới), "fresh" mang nghĩa tỉnh táo, tràn đầy năng lượng. Từ trái nghĩa trực tiếp là "tired" (mệt mỏi).<br>
+4. <strong>Tại sao A, B, D sai?</strong> Happy, dirty, lazy không phải là từ trái nghĩa thích hợp của fresh (sảng khoái, tươi tỉnh) trong ngữ cảnh này.`
+            },
+            {
+                qNum: 4,
+                question: "How long should you walk every day according to the passage?",
+                options: ["60 minutes", "10 minutes", "20 minutes", "30 minutes"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Theo đoạn văn, bạn nên đi bộ bao lâu mỗi ngày?<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. 60 minutes: 60 phút.<br>
+&nbsp;&nbsp;• B. 10 minutes: 10 phút.<br>
+&nbsp;&nbsp;• C. 20 minutes: 20 phút.<br>
+&nbsp;&nbsp;• D. 30 minutes: 30 phút.<br>
+3. <strong>Tại sao chọn D?</strong> Dẫn chứng trong bài: <em>"...or even walk for thirty minutes a day."</em> (hoặc thậm chí đi bộ 30 phút một ngày).<br>
+4. <strong>Tại sao A, B, C sai?</strong> Các số phút này không đúng với thông tin "thirty minutes" (30 phút) được nhắc đến trong đoạn văn.`
+            },
+            {
+                qNum: 5,
+                question: 'The word "stronger" in paragraph 2 is CLOSEST in meaning to _______.',
+                options: ["busier", "more powerful", "weaker", "faster"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Từ "stronger" ở đoạn 2 ĐỒNG NGHĨA (CLOSEST in meaning) nhất với từ nào?<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. busier: Bận rộn hơn.<br>
+&nbsp;&nbsp;• B. more powerful: Khỏe mạnh hơn, nhiều năng lượng hơn.<br>
+&nbsp;&nbsp;• C. weaker: Yếu hơn.<br>
+&nbsp;&nbsp;• D. faster: Nhanh hơn.<br>
+3. <strong>Tại sao chọn B?</strong> "stronger" nghĩa là khỏe mạnh hơn, đồng nghĩa với "more powerful" (mạnh mẽ hơn, khỏe hơn).<br>
+4. <strong>Tại sao A, C, D sai?</strong> "busier" là bận rộn hơn; "weaker" là yếu hơn (trái nghĩa); "faster" là nhanh hơn.`
+            },
+
+            // Sentence Rearrangement Cues
+            {
+                section: "Mark the letter A, B, C, or D on your answer sheet to indicate the sentence that is made from the given cues in each of the following questions.",
+                qNum: 6,
+                question: "We / go / to / the countryside / every weekend / when / we / be / students.",
+                options: [
+                    "We went to countryside every weekend when we are students.",
+                    "We go to the countryside every weekend when we were students.",
+                    "We went to the countryside every weekend when we were students.",
+                    "We goes to the countryside every weekend when we were students."
+                ],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Dựng câu hoàn chỉnh từ các từ gợi ý.<br>
+2. <strong>Dịch nghĩa 4 đáp án:</strong><br>
+&nbsp;&nbsp;• A. Sai thì "are" và thiếu mạo từ "the".<br>
+&nbsp;&nbsp;• B. Sai sự hòa hợp thì "go" - "were".<br>
+&nbsp;&nbsp;• C. Chúng tôi đã đi về quê mỗi cuối tuần khi chúng tôi còn là học sinh. (Chính xác)<br>
+&nbsp;&nbsp;• D. Sai ngữ pháp động từ "goes" đi với "We".<br>
+3. <strong>Tại sao chọn C?</strong> Mệnh đề "when we were students" diễn tả thói quen quá khứ -> Cả 2 vế chia Quá khứ đơn (went - were). Đồng thời có "the countryside".`
+            },
+            {
+                qNum: 7,
+                question: "your mother/go/to/market/everyday?",
+                options: [
+                    "Is your mother goes to the market everyday?",
+                    "Does your mother goes to the market everyday?",
+                    "Does your mother go to the market everyday?",
+                    "Is your mother go to the market everyday?"
+                ],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Mẹ của bạn có đi chợ mỗi ngày không?<br>
+2. <strong>Tại sao chọn C?</strong> Hiện tại đơn hỏi với động từ thường: <strong>Does + Subject (số ít) + V(nguyên thể)</strong> -> "Does your mother go...".<br>
+3. <strong>Tại sao A, B, D sai?</strong> A & D dùng to-be "Is" với V thường; B đã có "Does" nhưng vẫn chia "goes" là sai.`
+            },
+            {
+                qNum: 8,
+                question: "They / enjoy / listen / to / music / after / school.",
+                options: [
+                    "They enjoy listen music after school.",
+                    "They enjoy listening to music after school.",
+                    "They enjoy to listen music after school.",
+                    "They enjoys listening to music after school."
+                ],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu hỏi:</strong> Họ thích nghe nhạc sau giờ học.<br>
+2. <strong>Tại sao chọn B?</strong> Cấu trúc: <strong>enjoy + V-ing</strong> và cụm <strong>listen to music</strong>. Chủ ngữ "They" động từ nguyên thể.<br>
+3. <strong>Tại sao A, C, D sai?</strong> A dùng V nguyên thể; C dùng to-V; D thêm "s" vào enjoys sai chủ ngữ.`
+            },
+
+            // Cloze Test 1
+            {
+                section: `Read the passage and choose the correct answer A, B, C, or D to fill in each blank.<br>
+<div class="bg-purple-50 p-4 rounded-xl my-2 border border-purple-200">
+Many students enjoy reading books in their free time. To encourage this hobby, a group of students has started a book-sharing club. Every month, the students (9) _______ books with another. Some students enjoy reading comics, while others prefer adventure stories or books about animals. Each member brings a book from home and shares it with the others. They also write short reviews to tell their friends (10) _______ the books they have read. Reading is a useful hobby because it helps students improve their vocabulary. Some students also (11) _______ to read books in English to practise the language. The club gives them a chance to make friends and learn new things. All the members feel (12) _______ when they discover an interesting book.
+</div>`,
+                qNum: 9,
+                question: "Choose the correct answer for position (9)",
+                options: ["exchanges", "exchanging", "exchanged", "exchange"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu:</strong> "Every month, the students exchange books with another." (Mỗi tháng, các học sinh trao đổi sách với nhau).<br>
+2. <strong>Tại sao chọn D?</strong> "Every month" -> Thì Hiện tại đơn. Chủ ngữ "the students" số nhiều -> Động từ giữ nguyên thể <strong>exchange</strong>.<br>
+3. <strong>Tại sao A, B, C sai?</strong> A chia số ít; B là V-ing; C là quá khứ.`
+            },
+            {
+                qNum: 10,
+                question: "Choose the correct answer for position (10)",
+                options: ["for", "about", "at", "with"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu:</strong> "...tell their friends about the books they have read." (...kể cho bạn bè nghe về những cuốn sách họ đã đọc).<br>
+2. <strong>Tại sao chọn B?</strong> Cấu trúc: <strong>tell somebody about something</strong> (kể cho ai nghe về cái gì).`
+            },
+            {
+                qNum: 11,
+                question: "Choose the correct answer for position (11)",
+                options: ["suggest", "decide", "avoid", "enjoy"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu:</strong> "Some students also decide to read books in English..." (Một số học sinh cũng quyết định đọc sách bằng tiếng Anh...).<br>
+2. <strong>Tại sao chọn B?</strong> Phía sau là <strong>to-V</strong> ("to read"). Chỉ có <strong>decide + to V</strong>.<br>
+3. <strong>Tại sao A, C, D sai?</strong> suggest, avoid, enjoy đều đi với <strong>V-ing</strong>.`
+            },
+            {
+                qNum: 12,
+                question: "Choose the correct answer for position (12)",
+                options: ["exciting", "excitement", "excited", "excite"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch câu:</strong> "All the members feel excited when they discover an interesting book." (Tất cả thành viên đều cảm thấy hào hứng...).<br>
+2. <strong>Tại sao chọn C?</strong> Sau <strong>feel</strong> + tính từ chỉ cảm xúc con người đuôi -ed (<strong>excited</strong>).`
+            },
+
+            // Pronunciation
+            {
+                section: "Mark the letter A, B, C or D on your answer sheet to indicate the word whose underlined part differs from the other three in pronunciation in each of the following questions.",
+                qNum: 13,
+                question: "Choose the word whose underlined part is pronounced differently:",
+                options: ["<u>f</u>ish", "o<u>f</u>", "<u>f</u>an", "<u>f</u>ace"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Phiên âm & Dịch nghĩa:</strong><br>
+&nbsp;&nbsp;• A. <u>f</u>ish /fɪʃ/ (n): Con cá -> /f/<br>
+&nbsp;&nbsp;• B. o<u>f</u> /əv/ (prep): Của -> <strong>/v/</strong><br>
+&nbsp;&nbsp;• C. <u>f</u>an /fæn/ (n): Cái quạt -> /f/<br>
+&nbsp;&nbsp;• D. <u>f</u>ace /feɪs/ (n): Khuôn mặt -> /f/<br>
+2. <strong>Tại sao chọn B?</strong> Chữ "f" trong "of" phát âm là /v/, còn lại phát âm là /f/.`
+            },
+            {
+                qNum: 14,
+                question: "Choose the word whose underlined part is pronounced differently:",
+                options: ["stopp<u>ed</u>", "want<u>ed</u>", "look<u>ed</u>", "wash<u>ed</u>"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Quy tắc đuôi -ed:</strong><br>
+&nbsp;&nbsp;• A. stopped /stɒpt/ -> /t/<br>
+&nbsp;&nbsp;• B. wanted /ˈwɒntɪd/ -> <strong>/ɪd/</strong><br>
+&nbsp;&nbsp;• C. looked /lʊkt/ -> /t/<br>
+&nbsp;&nbsp;• D. washed /wɒʃt/ -> /t/<br>
+2. <strong>Tại sao chọn B?</strong> Từ kết thúc bằng âm /t/ (want) khi thêm -ed phát âm là /ɪd/. các từ còn lại phát âm là /t/.`
+            },
+
+            // Ordering / Ending text
+            {
+                section: "Mark the letter A, B, C, or D on your answer sheet to indicate the correct answer to each of the following questions.",
+                qNum: 15,
+                question: `Put the sentences (a-c) in the correct order, then fill in the blank to make a logical text.<br>
+<em>Eating a balanced diet is very important for your health. _______</em><br>
+a. Secondly, it gives your body the energy it needs to work properly every day.<br>
+b. Firstly, it provides the necessary nutrients, vitamins, and minerals.<br>
+c. Moreover, a healthy diet can reduce the risk of heart disease and obesity.`,
+                options: ["b - c - a", "b - a - c", "a - b - c", "c - b - a"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Logic trình bày:</strong> Đầu tiên dùng <em>Firstly</em> (b) -> Tiếp theo <em>Secondly</em> (a) -> Bổ sung thêm ý <em>Moreover</em> (c).<br>
+2. <strong>Thứ tự đúng:</strong> b - a - c (Đáp án B).`
+            },
+            {
+                qNum: 16,
+                question: "Choose the sentence that most appropriately ends the text above.",
+                options: [
+                    "In short, eating well helps you live a longer and healthier life.",
+                    "However, eating too much fast food can cause health problems.",
+                    "It's also important to sleep early and get enough rest.",
+                    "To conclude, exercise and diet are both important for students."
+                ],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn A?</strong> Bài viết về chế độ ăn uống lành mạnh. Câu kết hợp lý nhất là dùng "In short" tóm lược lại lợi ích chính (ăn uống tốt giúp sống lâu và khỏe mạnh).`
+            },
+
+            // Notices / Signs
+            {
+                section: "Read the following sign / notice and mark the letter A, B, C or D on your answer sheet to indicate the correct answer to each of the following questions.",
+                qNum: 17,
+                question: `What does this notice say?<br>
+<div class="my-2 p-3 bg-amber-100 border-2 border-amber-400 rounded-xl font-mono text-center text-amber-900 font-bold">
+📢 Please turn off your mobile phones during the performance.
+</div>`,
+                options: [
+                    "You should answer phone calls outside the theater.",
+                    "You mustn't use your phone while the performance is on.",
+                    "You may turn on your phone after the show.",
+                    "You can use your phone quietly during the performance."
+                ],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dịch thông báo:</strong> Vui lòng tắt điện thoại di động trong suốt buổi diễn.<br>
+2. <strong>Tại sao chọn B?</strong> "Turn off" = "mustn't use your phone" (không được dùng điện thoại khi buổi diễn đang diễn ra).`
+            },
+            {
+                qNum: 18,
+                question: `What does the notice say?<br>
+<div class="my-2 p-4 bg-white border-2 border-red-500 rounded-xl flex items-center justify-center gap-4">
+    <div class="w-16 h-16 rounded-full border-4 border-red-600 flex items-center justify-center relative">
+        <span class="text-2xl font-black text-black">P</span>
+        <div class="absolute w-full h-1 bg-red-600 rotate-45"></div>
+    </div>
+    <span class="font-bold text-red-600">NO PARKING</span>
+</div>`,
+                options: [
+                    "This place is for parking.",
+                    "This is for parking your car.",
+                    "You must park your car here.",
+                    "You mustn't park your car in this area."
+                ],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Ý nghĩa biển báo:</strong> Biển cấm đỗ xe (No Parking).<br>
+2. <strong>Tại sao chọn D?</strong> "You mustn't park your car in this area." (Bạn không được đỗ xe ở khu vực này).`
+            },
+
+            // Instructions Cloze
+            {
+                section: `Read the following instructions and mark the letter A, B, C, or D on your answer sheet to indicate the correct option that best fits each of the numbered blanks.<br>
+<div class="bg-blue-50 p-4 rounded-xl my-2 border border-blue-200">
+<strong>HOW TO BE A GOOD VOLUNTEER</strong><br>
+1. Spend time helping people (19) _______ your neighborhood or local area.<br>
+2. Take part in community activities such as cleaning the park or (20) _______ trees.<br>
+3. Work with (21) _______ volunteers to make your projects more effective.<br>
+4. Remember (22) _______ thank everyone for their time and effort after each event.
+</div>`,
+                qNum: 19,
+                question: "Choose option for blank (19)",
+                options: ["about", "from", "on", "in"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn D?</strong> Cụm từ chuẩn: <strong>in your neighborhood</strong> (trong khu phố của bạn).`
+            },
+            {
+                qNum: 20,
+                question: "Choose option for blank (20)",
+                options: ["planting", "vine", "meat", "beer"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn A?</strong> Cụm từ: <strong>plant trees</strong> (trồng cây). Dạng V-ing song song với "cleaning".`
+            },
+            {
+                qNum: 21,
+                question: "Choose option for blank (21)",
+                options: ["a lot", "much", "few", "a lot of"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn D?</strong> "volunteers" là danh từ số nhiều -> Dùng <strong>a lot of</strong>.`
+            },
+            {
+                qNum: 22,
+                question: "Choose option for blank (22)",
+                options: ["say", "saying", "said", "to say"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn D?</strong> Cấu trúc <strong>Remember + to V</strong> (Hãy nhớ làm gì).`
+            },
+
+            // Grammar & Vocab Questions
+            {
+                section: "Mark the letter A, B, C, or D on your answer sheet to indicate the correct answer to each of the following questions.",
+                qNum: 23,
+                question: "The film that I _______ last night _______ very interesting.",
+                options: ["saw - was", "saw - were", "see - was", "see - wore"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Dấu hiệu:</strong> "last night" -> Thì Quá khứ đơn (saw - was).`
+            },
+            {
+                qNum: 24,
+                question: "Eating more fruit and vegetables can help to _______ some diseases.",
+                options: ["affect", "develop", "avoid", "provide"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn C?</strong> "avoid diseases" (phòng tránh bệnh tật).`
+            },
+            {
+                qNum: 25,
+                question: "If you spend too much time under the sun, you may get _______.",
+                options: ["sunburn", "skin", "acne", "spots"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Tại sao chọn A?</strong> "get sunburn" (bị cháy nắng).`
+            },
+            {
+                qNum: 26,
+                question: "After the picnic, we helped the volunteers pick _______ the rubbish in the park.",
+                options: ["down", "in", "up", "over"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Cụm động từ:</strong> <strong>pick up rubbish</strong> (nhặt rác).`
+            },
+            {
+                qNum: 27,
+                question: "_______ a horse is one of my favorite hobbies.",
+                options: ["Making", "Riding", "Building", "Going"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Kết hợp từ:</strong> <strong>riding a horse</strong> (cưỡi ngựa).`
+            },
+            {
+                qNum: 28,
+                question: "Linda loves outdoor activities, and she _______ jogging in the morning.",
+                options: ["go often", "goes often", "often goes", "often went"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Trạng từ chỉ tần suất:</strong> Đứng trước động từ thường (<strong>often goes</strong>).`
+            },
+            {
+                qNum: 29,
+                question: `A student and his teacher are talking about a clean-up activity.<br>
+Student: "We picked up rubbish along the river yesterday."<br>
+Teacher: "_______"`,
+                options: ["That sounds great", "No, thanks", "Yes, thank you", "Not at all"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Phản hồi:</strong> "That sounds great" (Nghe tuyệt đấy!) khen ngợi hành động tốt.`
+            },
+            {
+                qNum: 30,
+                question: "We _______ old textbooks to children in rural area last summer.",
+                options: ["donated", "taught", "read", "helped"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Cấu trúc:</strong> <strong>donate something to somebody</strong> (quyên góp cái gì cho ai).`
+            },
+            {
+                qNum: 31,
+                question: "We avoid sweetened food _______ soft drinks.",
+                options: ["but", "so", "yet", "and"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Liên từ:</strong> "and" dùng để liệt kê danh từ song song.`
+            },
+
+            // Stress
+            {
+                section: "Mark the letter A, B, C, or D on your answer sheet to indicate the word that differs from the other three in the position of primary stress in each of the following questions.",
+                qNum: 32,
+                question: "Choose the word with different stress position:",
+                options: ["t<u>ea</u>cher", "dec<u>i</u>de", "prep<u>a</u>re", "att<u>e</u>nd"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+• A. teacher /ˈtiː.tʃər/ -> Trọng âm 1<br>
+• B. decide /dɪˈsaɪd/ -> Trọng âm 2<br>
+• C. prepare /prɪˈpeər/ -> Trọng âm 2<br>
+• D. attend /əˈtend/ -> Trọng âm 2`
+            },
+            {
+                qNum: 33,
+                question: "Choose the word with different stress position:",
+                options: ["h<u>o</u>bby", "c<u>ou</u>ntry", "l<u>e</u>sson", "coll<u>e</u>ct"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+• A. hobby /ˈhɒb.i/ -> Trọng âm 1<br>
+• B. country /ˈkʌn.tri/ -> Trọng âm 1<br>
+• C. lesson /ˈles.ən/ -> Trọng âm 1<br>
+• D. collect /kəˈlekt/ -> Trọng âm 2`
+            },
+
+            // Sentence Transformations
+            {
+                section: "Mark the letter A, B, C or D on your answer sheet to indicate the sentence that is closest in meaning to the original sentence in each of the following questions.",
+                qNum: 34,
+                question: "Natalie isn't interested in sleeping in at the weekend.",
+                options: [
+                    "Natalie doesn't sleep in at the weekend.",
+                    "Natalie doesn't be interested in sleeping in at the weekend.",
+                    "Natalie doesn't sleeps in at the weekend.",
+                    "Natalie doesn't like sleeping in at the weekend."
+                ],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Cấu trúc đồng nghĩa:</strong> <strong>be not interested in</strong> = <strong>don't/doesn't like</strong>.`
+            },
+            {
+                qNum: 35,
+                question: "He thinks that watching too much TV is harmful.",
+                options: [
+                    "He finds watching too much TV harmfully.",
+                    "He finds watching too much TV is harmful.",
+                    "He finds to watch too much TV harmful.",
+                    "He finds watching too much TV harmful."
+                ],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Cấu trúc:</strong> <strong>find + V-ing + adj</strong> (nhận thấy việc gì như thế nào).`
+            },
+            {
+                qNum: 36,
+                question: "Sitting close to the TV screen is not good for you.",
+                options: [
+                    "You shouldn't sit close to the TV screen.",
+                    "You shouldn't sitting close to the TV screen.",
+                    "You shouldn't sit closely to the TV screen.",
+                    "You should sit far from the TV screen."
+                ],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Biến đổi câu:</strong> "is not good for you" = "You shouldn't sit close...".`
+            },
+
+            // Paragraph Insertion
+            {
+                section: `Four phrases/sentences have been removed from the text below. For each question, mark the letter A, B, C or D on your answer sheet to indicate the correct option that best fits each of the numbered blanks.<br>
+<div class="bg-amber-50 p-4 rounded-xl my-2 border border-amber-200">
+<strong>ENJOYING YOUR HOBBY</strong><br>
+Having a hobby is an important part of life. It helps people relax, have fun, and learn new things. There are many kinds of hobbies that people can choose from, such as reading, painting, gardening, or playing sports.<br>
+First, you should (37) _______. You can try different activities to see which one makes you happy and comfortable.<br>
+Second, make sure your hobby is good for your health and your mind. (38) _______ These hobbies help you stay active and meet new friends.<br>
+Third, try to spend some time on your hobby every day or every week. It helps you feel relaxed after studying or working. (39) _______ They make you forget stress and bring you joy.<br>
+Finally, don't be afraid to share your hobby with others. You can join a club or a group of people who like the same activity. (40) _______ Sharing your interest can make your hobby even more enjoyable!<br><br>
+<strong>Các câu lựa chọn:</strong><br>
+A. Hobbies are a great way to keep your mind and body healthy<br>
+B. Sports like badminton, cycling, or swimming are very popular<br>
+C. You can learn many useful skills and make new friends<br>
+D. choose a hobby that you really enjoy
+</div>`,
+                qNum: 37,
+                question: "Choose the sentence for position (37)",
+                options: ["Option A", "Option B", "Option C", "Option D"],
+                correct: 3,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Vị trí (37):</strong> Điền Option D ("choose a hobby that you really enjoy").`
+            },
+            {
+                qNum: 38,
+                question: "Choose the sentence for position (38)",
+                options: ["Option A", "Option B", "Option C", "Option D"],
+                correct: 1,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Vị trí (38):</strong> Điền Option B ("Sports like badminton, cycling, or swimming are very popular").`
+            },
+            {
+                qNum: 39,
+                question: "Choose the sentence for position (39)",
+                options: ["Option A", "Option B", "Option C", "Option D"],
+                correct: 0,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Vị trí (39):</strong> Điền Option A ("Hobbies are a great way to keep your mind and body healthy").`
+            },
+            {
+                qNum: 40,
+                question: "Choose the sentence for position (40)",
+                options: ["Option A", "Option B", "Option C", "Option D"],
+                correct: 2,
+                explanation: `<strong>PHẦN GIẢI THÍCH CHI TIẾT:</strong><br>
+1. <strong>Vị trí (40):</strong> Điền Option C ("You can learn many useful skills and make new friends").`
+            }
+        ];
+
+        // State variables
+        let userAnswers = {};
+        let shuffledQuestions = [];
+
+        // Shuffle Array Helper Algorithm
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Initialize and Render Quiz
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            let currentSection = '';
+
+            rawQuestions.forEach((q, idx) => {
+                // Section Header
+                if (q.section && q.section !== currentSection) {
+                    currentSection = q.section;
+                    const secDiv = document.createElement('div');
+                    secDiv.className = "bg-white/80 backdrop-blur-md p-4 rounded-2xl border-l-8 border-purple-600 shadow-md font-bold text-gray-800 text-sm md:text-base";
+                    secDiv.innerHTML = q.section;
+                    container.appendChild(secDiv);
+                }
+
+                // Passage Header if exists
+                if (q.passage) {
+                    const passDiv = document.createElement('div');
+                    passDiv.className = "bg-white/90 p-5 rounded-2xl shadow-md border border-purple-100 leading-relaxed text-sm md:text-base text-gray-700";
+                    passDiv.innerHTML = q.passage;
+                    container.appendChild(passDiv);
+                }
+
+                // Prepare Shuffled Options
+                let optionsWithIndex = q.options.map((opt, originalIdx) => ({
+                    text: opt,
+                    originalIndex: originalIdx
+                }));
+                optionsWithIndex = shuffle(optionsWithIndex);
+
+                shuffledQuestions[idx] = {
+                    ...q,
+                    shuffledOptions: optionsWithIndex
+                };
+
+                // Question Card
+                const card = document.createElement('div');
+                card.className = "quiz-card p-5 md:p-6 space-y-4 border border-white/60";
+                card.id = `question-card-${idx}`;
+
+                let optionsHTML = '';
+                const labels = ['A', 'B', 'C', 'D'];
+
+                optionsWithIndex.forEach((optObj, optIdx) => {
+                    optionsHTML += `
+                        <button onclick="selectOption(${idx}, ${optIdx})" 
+                                id="btn-${idx}-${optIdx}" 
+                                class="btn-3d btn-option w-full p-4 flex items-center gap-3 font-semibold text-sm md:text-base transition-all">
+                            <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm shrink-0">
+                                ${labels[optIdx]}
+                            </span>
+                            <span class="flex-1">${optObj.text}</span>
+                        </button>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="bg-purple-600 text-white font-extrabold px-3 py-1 rounded-xl text-sm shrink-0 shadow">
+                            Câu ${q.qNum}
+                        </span>
+                        <h3 class="font-bold text-gray-800 text-base md:text-lg leading-snug">
+                            ${q.question}
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 pt-2">
+                        ${optionsHTML}
+                    </div>
+
+                    <!-- Explanation Box (Initially Hidden) -->
+                    <div id="explanation-${idx}" class="hidden mt-4 p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-gray-800 text-sm leading-relaxed space-y-2 animate-fade-in shadow-inner">
+                        <div class="font-extrabold text-amber-800 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> GIẢI THÍCH CHI TIẾT
+                        </div>
+                        <div>${q.explanation}</div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Handle Option Selection
+        function selectOption(qIdx, optIdx) {
+            const qData = shuffledQuestions[qIdx];
+            const selectedOpt = qData.shuffledOptions[optIdx];
+            const isCorrect = selectedOpt.originalIndex === qData.correct;
+
+            // Lock options for this question
+            qData.shuffledOptions.forEach((_, i) => {
+                const btn = document.getElementById(`btn-${qIdx}-${i}`);
+                btn.disabled = true;
+            });
+
+            const selectedBtn = document.getElementById(`btn-${qIdx}-${optIdx}`);
+            const card = document.getElementById(`question-card-${qIdx}`);
+
+            if (isCorrect) {
+                selectedBtn.classList.add('selected-correct');
+                playDing();
+                confetti({
+                    particleCount: 40,
+                    spread: 60,
+                    origin: { y: 0.7 }
+                });
+                userAnswers[qIdx] = true;
+            } else {
+                selectedBtn.classList.add('selected-wrong');
+                card.classList.add('animate-shake');
+                playWrong();
+                
+                // Highlight correct answer
+                qData.shuffledOptions.forEach((opt, i) => {
+                    if (opt.originalIndex === qData.correct) {
+                        document.getElementById(`btn-${qIdx}-${i}`).classList.add('selected-correct');
+                    }
+                });
+                userAnswers[qIdx] = false;
+            }
+
+            // Show explanation immediately
+            document.getElementById(`explanation-${qIdx}`).classList.remove('hidden');
+
+            // Update Progress
+            updateProgress();
+        }
+
+        // Update Progress Bar & Score
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const correctCount = Object.values(userAnswers).filter(Boolean).length;
+
+            document.getElementById('progress-text').innerText = `${answeredCount}/40`;
+            document.getElementById('score-text').innerText = `${correctCount * 2.5}`;
+            document.getElementById('progress-bar').style.width = `${(answeredCount / 40) * 100}%`;
+        }
+
+        // Submit Quiz & Show Result Modal
+        function submitQuiz() {
+            const correctCount = Object.values(userAnswers).filter(Boolean).length;
+            const percentage = (correctCount / 40) * 100;
+            let feedback = "";
+
+            if (percentage < 50) {
+                feedback = "Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else if (percentage <= 80) {
+                feedback = "Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else {
+                feedback = "Làm tốt lắm, con cố gắng rinh điểm 10 ở lần sau nha!";
+            }
+
+            document.getElementById('modal-score').innerText = `${correctCount}`;
+            document.getElementById('modal-feedback').innerText = feedback;
+            document.getElementById('result-modal').classList.remove('hidden');
+
+            if (percentage >= 60) {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initQuiz();
+        };
+    </script>
+</body>
+</html>
